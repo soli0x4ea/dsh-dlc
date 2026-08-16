@@ -1,2 +1,13 @@
 {"ts":"06:11:31","command":"cmd_act","diff":{"ch_g_a":{"before":10,"after":15,"delta":5}},"flags":{}}
 {"ts":"06:11:31","command":"cmd_act","diff":{"ch_g_a":{"before":15,"after":30,"delta":15}},"flags":{}}
+{"ts":"07:12:36","command":"cmd_act","diff":{"ch_g_a":{"before":30,"after":35,"delta":5}},"flags":{}}
+{"ts":"07:12:39","command":"cmd_act","diff":{"ch_g_a":{"before":35,"after":40,"delta":5}},"flags":{}}
+{"ts":"07:12:52","command":"cmd_act","diff":{"ch_g_a":{"before":40,"after":45,"delta":5}},"flags":{}}
+{"ts":"07:12:56","command":"cmd_act","diff":{"ch_g_a":{"before":45,"after":50,"delta":5}},"flags":{}}
+{"ts":"07:13:03","command":"cmd_act","diff":{"ch_g_a":{"before":50,"after":55,"delta":5}},"flags":{}}
+{"ts":"07:13:06","command":"cmd_act","diff":{"ch_g_a":{"before":55,"after":60,"delta":5}},"flags":{}}
+{"ts":"07:13:57","command":"cmd_act","diff":{"ch_g_a":{"before":60,"after":65,"delta":5}},"flags":{}}
+{"ts":"07:14:01","command":"cmd_act","diff":{"ch_g_a":{"before":65,"after":70,"delta":5}},"flags":{}}
+{"ts":"07:14:05","command":"cmd_act","diff":{"ch_g_a":{"before":70,"after":75,"delta":5}},"flags":{}}
+{"ts":"07:14:07","command":"cmd_act","diff":{"ch_g_a":{"before":75,"after":80,"delta":5}},"flags":{}}
+{"ts":"07:14:10","command":"cmd_act","diff":{"ch_g_a":{"before":80,"after":85,"delta":5}},"flags":{}}

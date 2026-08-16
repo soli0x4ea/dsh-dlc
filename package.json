@@ -19,10 +19,14 @@
   "scripts": {
     "build": "tsc -p tsconfig.json && tsdown --config tsdown.config.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "tsx --test tests/**/*.test.ts"
+    "test": "pnpm run build && tsx --test tests/**/*.test.ts"
   },
   "dependencies": {
-    "zod": "^3.24.0"
+    "zod": "^3.24.0",
+    "@deepseek-ai/cordis": "file:/Users/soli/Documents/DSH/WORKS/deepseek-harness/vendor/cordis",
+    "@deepseek-ai/schemastery": "file:/Users/soli/Documents/DSH/WORKS/deepseek-harness/vendor/schemastery",
+    "@deepseek-ai/dsh-tools": "file:/Users/soli/Documents/DSH/WORKS/deepseek-harness/packages/core/tools",
+    "@deepseek-ai/dsh-system-prompt": "file:/Users/soli/Documents/DSH/WORKS/deepseek-harness/packages/core/system-prompt"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

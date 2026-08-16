@@ -79,3 +79,6 @@ export { executeTool, getStateTool, resetTool, DLC_TOOLS } from './tools'
 export type { DlcToolSchema } from './tools'
 
 export { DlcEngine } from './engine'
+
+export { apply as dlcPlugin, Config as dlcPluginConfig } from './plugin'
+export type { DlcService } from './plugin'
