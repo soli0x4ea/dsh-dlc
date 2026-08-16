@@ -52,7 +52,6 @@ export {
   ResolverError,
 } from './card-loader'
 export type { ModuleIndex } from './card-loader'
-export { StateManager } from './persistence'
 
 export {
   loadCommands,
@@ -70,5 +69,13 @@ export type { CommandEffect, CommandResult, ItemConfig } from './interaction'
 export { NarrativeAssembly } from './narrative'
 export { DlcEventBus } from './events'
 export type { DlcStateChangeEvent, DlcStateChangeListener, DlcEventSink } from './events'
+
+
+export { ChatlogStore, TimelineStore, MemorySearch, recordChat } from './memory'
+export type { ChatlogEntry, TimelineEntry } from './memory'
+export { FileStateStore, MemoryStateStore, StateManager } from './storage'
+export type { StateStore } from './storage'
+export { executeTool, getStateTool, resetTool, DLC_TOOLS } from './tools'
+export type { DlcToolSchema } from './tools'
 
 export { DlcEngine } from './engine'

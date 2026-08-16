@@ -12,6 +12,7 @@ import type {
   ThresholdConfig,
 } from './types'
 import type { CommandConfig } from './interaction'
+import { ChatlogStore, TimelineStore, MemorySearch } from './memory'
 import {
   DLC_PROTOCOL_VERSION,
   MODULE_DEPENDENCIES,
@@ -135,7 +136,7 @@ export class ResolverError extends Error {}
 
 export class ConfigResolver {
   private readonly cache = new Map<string, Record<string, unknown>>()
-  private readonly card: CardJson
+  readonly card: CardJson
   private readonly paths: ModuleIndex
   private readonly cardDir: string
 
@@ -234,6 +235,16 @@ export class CardRuntimeContext {
 
   get stateDir(): string {
     return this.resolver.stateDir
+  }
+
+  /** memory 模块启用时自动加载记忆存储（对照 context.py _init_memory）。 */
+  get memory(): { chatlog: ChatlogStore; timeline: TimelineStore; search: MemorySearch } | null {
+    const memCfg = (this.resolver.card.modules?.memory ?? {}) as Record<string, unknown>
+    if (memCfg.enabled !== true) return null
+    const memRoot = join(this.cardDir, 'MEMORY')
+    const chatlog = new ChatlogStore(join(memRoot, 'chatlog'))
+    const timeline = new TimelineStore(join(memRoot, 'timeline'))
+    return { chatlog, timeline, search: new MemorySearch(chatlog, timeline) }
   }
 
   private safeLoad(module: string, subKey: string): Record<string, unknown> {
