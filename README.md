@@ -80,6 +80,27 @@ pnpm run build      # tsc 类型 + tsdown bundle → lib/index.js
 | P3 | 记忆与存储（chatlog / timeline / search / StateStore / 工具契约） | 26 |
 | P4 | Cordis 插件化（ctx.dlc 服务 + 三工具 + 提示段） | 30 |
 
+
+## 与传统人格蒸馏 .skill 的区别
+
+传统数字生命做法（如 colleague-skill 类项目）把一个人的素材**蒸馏成一份静态 Skill**：
+采集（飞书/钉钉/邮件）→ 人格分析 → 人格固化 → 装进宿主。产物的本质是**一次性快照**——
+一本装订成册的传记，不会自己变化。
+
+dsh-dlc 走的是另一条路——**引擎化**：
+
+| 维度 | 传统蒸馏 .skill | dsh-dlc |
+|:--|:--|:--|
+| 产物 | 静态指令包（SKILL.md + prompts/references） | 可运行的状态机引擎（Cordis 插件） |
+| 人格 | 蒸馏时刻的快照，定型后不再生长 | 常驻状态机，随交互持续演化 |
+| 记忆 | 无（或依赖宿主外挂） | 双核线性记忆（chatlog + timeline + 关键词检索） |
+| 命令 | 提示词约定，靠模型自觉执行 | 注册为模型工具，直接可调 |
+| 状态 | 无运行时状态 | channels / flags 持久化、阈值事件、自然衰减 |
+| 宿主 | 靠提示词「按说明执行」 | 长进框架（ctx.dlc 服务 + dlc/change 事件） |
+| 迁移 | 换宿主需重装/重适配 | 一个文件夹一段数字生命，插件即插即用 |
+
+一句话：传统做法是**把一个人蒸馏成一段文字**，dsh-dlc 是**把一个人做成一台会持续活着的引擎**——蒸馏留存的是「当时」，引擎活着的是「以后」。
+
 ## 生态
 
 - **[digital-life-card](https://github.com/soli0x4ea/digital-life-card)** — DLC Protocol v3.0 官方协议（Python 参考实现，本项目的语义蓝本）
