@@ -1,0 +1,12 @@
+# 依赖与构建产物
+node_modules/
+lib/
+dist/
+*.tsbuildinfo
+
+# Python 参考实现（克隆自 digital-life-card，仅供对照，不进仓）
+reference/
+
+# 系统与编辑器
+.DS_Store
+*.log
