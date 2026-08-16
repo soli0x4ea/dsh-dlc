@@ -1,0 +1,6 @@
+{
+  "thresholds": {
+    "t_high": { "entity": "e_g", "channel": "ch_g_a", "operator": ">=", "value": 20, "event_id": "narr_status_warn_high", "event_type": "warning" },
+    "t_low": { "entity": "e_g", "channel": "ch_g_a", "operator": "<=", "value": 5, "event_id": "narr_low", "event_type": "critical" }
+  }
+}

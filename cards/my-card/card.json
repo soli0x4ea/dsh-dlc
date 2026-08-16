@@ -1,0 +1,22 @@
+{
+  "protocol_version": "1.0.0",
+  "card_id": "my-card",
+  "card_name": "测试卡",
+  "complexity_level": "L3",
+  "author": "soli",
+  "created_at": "2026-08-16",
+  "updated_at": "2026-08-16",
+  "description": "dsh-dlc P1 冒烟测试卡",
+  "modules": {
+    "identity": { "enabled": true },
+    "body": { "enabled": true },
+    "engine": {
+      "enabled": true,
+      "entities": "engine/entities.json",
+      "modifiers": "engine/modifiers.json",
+      "thresholds": "engine/thresholds.json",
+      "narratives": "engine/narratives.json"
+    },
+    "interaction": { "enabled": true, "commands": "interaction/commands.json" }
+  }
+}

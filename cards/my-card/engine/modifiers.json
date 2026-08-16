@@ -1,0 +1,10 @@
+{
+  "modifiers": {
+    "m_add": { "label": "m_add", "effects": { "ch_g_a": { "type": "add", "base": 5 } } },
+    "m_set": { "label": "m_set", "effects": { "ch_g_s": { "type": "set", "base": 99 } } },
+    "m_multiply": { "label": "m_multiply", "effects": { "ch_g_a": { "type": "multiply", "base": 2 } } },
+    "m_flag": { "label": "m_flag", "type": "flag_toggle", "flag": "f_on" },
+    "m_state_set": { "label": "m_state_set", "effects": { "ch_g_s": { "type": "state_set", "base": 50, "duration_ticks": 3 } } },
+    "m_clamp": { "label": "m_clamp", "effects": { "ch_g_a": { "type": "add", "base": 500 } } }
+  }
+}

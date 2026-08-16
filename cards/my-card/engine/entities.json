@@ -1,0 +1,12 @@
+{
+  "entities": {
+    "e_g": {
+      "channels": {
+        "ch_g_a": { "initial": 10, "min": 0, "max": 100 },
+        "ch_g_s": { "initial": 20 },
+        "ch_g_decay": { "initial": 30, "decay_per_tick": 5 }
+      },
+      "flags": { "f_on": 1 }
+    }
+  }
+}

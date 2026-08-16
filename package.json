@@ -1,0 +1,33 @@
+{
+  "name": "@soli/dsh-dlc",
+  "version": "0.1.0",
+  "description": "DLC 数字生命卡片协议 × DeepSeek Harness 原生插件（全量 TypeScript 重写）",
+  "type": "module",
+  "main": "./lib/index.js",
+  "types": "./lib/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/types/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "cards"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json && tsdown --config tsdown.config.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "tsx --test tests/**/*.test.ts"
+  },
+  "dependencies": {
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "tsdown": "^0.22.2"
+  }
+}

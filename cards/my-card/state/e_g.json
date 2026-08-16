@@ -1,0 +1,12 @@
+{
+  "entity_id": "e_g",
+  "channels": {
+    "ch_g_a": 30,
+    "ch_g_s": 20,
+    "ch_g_decay": 30
+  },
+  "flags": {
+    "f_on": 1
+  },
+  "meta": {}
+}

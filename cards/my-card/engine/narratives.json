@@ -1,0 +1,8 @@
+{
+  "action.act": "执行了行动",
+  "action.act.3": "执行了高强度行动",
+  "threshold.high": "高值警告",
+  "threshold.low": "低值临界",
+  "system.status": "状态",
+  "system.reset": "重置"
+}

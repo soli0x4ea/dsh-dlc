@@ -1,0 +1,8 @@
+{
+  "commands": [
+    { "id": "cmd_status", "name": "状态", "effects": [] },
+    { "id": "cmd_reset", "name": "重置", "effects": [] },
+    { "id": "cmd_act", "name": "行动", "aliases": ["act"], "effects": [{ "type": "modifier", "modifier": "m_add" }] },
+    { "id": "cmd_clamp", "name": "钳制", "effects": [{ "type": "modifier", "modifier": "m_clamp" }] }
+  ]
+}
