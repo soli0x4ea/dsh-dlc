@@ -21,7 +21,6 @@ export type {
   ThresholdConfig,
   ThresholdEvent,
   ThresholdsConfig,
-  CommandConfig,
   NarrativesConfig,
   ChannelDiff,
   ExecuteResult,
@@ -54,4 +53,22 @@ export {
 } from './card-loader'
 export type { ModuleIndex } from './card-loader'
 export { StateManager } from './persistence'
+
+export {
+  loadCommands,
+  matchCommand,
+  parseInput,
+  executeCommand,
+  generateHelp,
+  loadItems,
+  validateRarity,
+  RARITY_LEVELS,
+  RARITY_DISPLAY,
+  Inventory,
+} from './interaction'
+export type { CommandEffect, CommandResult, ItemConfig } from './interaction'
+export { NarrativeAssembly } from './narrative'
+export { DlcEventBus } from './events'
+export type { DlcStateChangeEvent, DlcStateChangeListener, DlcEventSink } from './events'
+
 export { DlcEngine } from './engine'

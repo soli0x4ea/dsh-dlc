@@ -6,12 +6,12 @@ import { existsSync, readFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import type {
   CardJson,
-  CommandConfig,
   EntityConfig,
   ModifierConfig,
   NarrativesConfig,
   ThresholdConfig,
 } from './types'
+import type { CommandConfig } from './interaction'
 import {
   DLC_PROTOCOL_VERSION,
   MODULE_DEPENDENCIES,

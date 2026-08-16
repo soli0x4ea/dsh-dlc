@@ -154,15 +154,6 @@ export type ThresholdsConfig = Record<string, unknown>
 // 命令与道具（P2 使用；对照 dlc/interaction/*）
 // ═══════════════════════════════════════════════════════════════
 
-export interface CommandConfig {
-  id: string
-  name?: string
-  aliases?: string[]
-  description?: string
-  cooldown_seconds?: number
-  effects: ReadonlyArray<{ type: string; channel?: string; [k: string]: unknown }>
-}
-
 /** narratives 配置文件：叙事编号 → 叙事条目。 */
 export type NarrativesConfig = Record<string, unknown>
 

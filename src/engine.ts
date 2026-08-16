@@ -2,82 +2,85 @@
  * DLC v3.0 状态机引擎（TypeScript 重写）— 对照 dlc/sm/engine.py。
  *
  * 纯计算状态机：输入命令，输出叙事编号 + 状态 diff，零自然语言。
- * 叙事编号格式: <domain>.<type>[.<variant>][.<level>]
- *   action.ping / action.act.3 / action.act.a.3 / threshold.hp_low / system.status
+ * P2 升级：完整命令语义（触发词/别名/四类效果）+ 事件回调。
  */
 import { appendFileSync, mkdirSync } from 'node:fs'
 import { join, resolve } from 'node:path'
-import { CardRuntimeContext, unwrapConfig } from './card-loader'
+import { CardRuntimeContext } from './card-loader'
 import { createEntity, entityFromDict, entityToDict } from './entity'
-import type { CommandConfig, EntityConfig, ExecuteResult, StateSnapshot } from './types'
-import { applyEffect, applyModifier } from './modifiers'
+import type { EntityConfig, ExecuteResult, StateSnapshot } from './types'
 import { checkThresholds } from './thresholds'
 import { StateManager } from './persistence'
+import { executeCommand, loadCommands, parseInput } from './interaction'
+import type { CommandConfig, CommandEffect } from './interaction'
+import { DlcEventBus, type DlcStateChangeEvent } from './events'
 
 type EntityState = ReturnType<typeof createEntity>
+
+export interface DlcEngineOptions {
+  /** 事件总线；缺省自动创建内存总线。 */
+  events?: DlcEventBus
+}
 
 export class DlcEngine {
   readonly cardPath: string
   readonly cardId: string
   protected readonly ctx: CardRuntimeContext
   protected readonly stateMgr: StateManager
+  readonly events: DlcEventBus
   protected readonly entities = new Map<string, EntityState>()
   private readonly cooldowns = new Map<string, number>()
   private readonly commands: CommandConfig[]
 
-  constructor(cardPath: string) {
+  constructor(cardPath: string, options: DlcEngineOptions = {}) {
     this.cardPath = resolve(cardPath)
     this.ctx = new CardRuntimeContext(this.cardPath)
     this.cardId = this.ctx.cardId
     this.stateMgr = new StateManager(this.ctx)
-    this.commands = this.ctx.commands
+    this.commands = loadCommands(join(this.cardPath, 'interaction'))
+    this.events = options.events ?? new DlcEventBus()
     this.restoreEntities()
   }
-
-  // ═══════════════════════════════════════════════════════════
-  // Public API（对照 MCP 三工具）
-  // ═══════════════════════════════════════════════════════════
 
   execute(command: string, params: Record<string, unknown> = {}): ExecuteResult {
     const result: ExecuteResult = { narrative_ids: [], state_diff: {}, flags: {}, error: null }
 
-    // 1. 匹配命令：先按 id 精确匹配，再试别名
-    const cmd = this.matchCommand(command)
+    const [parsed] = parseInput(command, this.commands)
+    const cmd = parsed ?? this.commands.find((c) => c.id === command)
     if (cmd === undefined) {
       result.error = `Unknown command: ${command}`
       return result
     }
 
-    // 2. Meta 命令
     if (cmd.id === 'cmd_status' || cmd.id === 'cmd_reset' || cmd.id === 'cmd_end') {
       return this.handleMeta(cmd.id, result)
     }
 
-    // 3. 冷却
     if (this.isCooling(cmd)) {
       result.error = `Command ${cmd.id} on cooldown`
       return result
     }
 
-    // 4. 强度（intensity ?? count ?? 1）
     const intensity = Number(params.intensity ?? params.count ?? 1)
 
-    // 5. 应用效果
     const entity = this.getOrCreateEntity(this.primaryEntityId())
     const before = { ...entity.channels }
     const beforeFlags = { ...entity.flags }
 
     const effectIds: string[] = []
     for (const effect of cmd.effects) {
-      if (this.executeEffect(effect, entity, intensity)) {
+      const eff: CommandEffect = { ...effect }
+      if (intensity !== 1.0 && eff.type === 'modifier') {
+        eff.intensity = intensity
+      }
+      const execResult = executeCommand(eff, entity, this.ctx.modifiers, this.ctx.entities[entity.entity_id])
+      if (execResult.success) {
         effectIds.push(this.actionId(cmd, intensity))
       }
     }
 
-    // 6. Post-effects hook（卡片特有，可覆写）
     effectIds.push(...this.postEffectsHook(entity, before, cmd.id, command))
 
-    // 7. 阈值
     const seen = new Set<string>()
     for (const tev of checkThresholds(entity, this.ctx.thresholds, 0)) {
       if (seen.has(tev.event_id)) continue
@@ -85,10 +88,8 @@ export class DlcEngine {
       effectIds.push(this.thresholdId(tev.event_id))
     }
 
-    // 8. 保存
     this.saveEntity(entity)
 
-    // 9. Diff
     const after = { ...entity.channels }
     const afterFlags = { ...entity.flags }
     const diff: ExecuteResult['state_diff'] = {}
@@ -107,9 +108,20 @@ export class DlcEngine {
     result.state_diff = diff
     result.flags = flagDiff
 
-    // 10. 冷却 + 审计
     this.markUsed(cmd)
     this.writeStateChange(command, diff, flagDiff)
+    this.emitChange({
+      card_id: this.cardId,
+      entity_id: entity.entity_id,
+      command: cmd.id,
+      narrative_ids: [...effectIds],
+      channels_before: { ...before },
+      channels_after: after,
+      flags_before: { ...beforeFlags },
+      flags_after: afterFlags,
+      diff,
+      timestamp: Date.now(),
+    })
 
     return result
   }
@@ -140,10 +152,6 @@ export class DlcEngine {
     return { status: 'reset', card_id: this.cardId }
   }
 
-  // ═══════════════════════════════════════════════════════════
-  // 可覆写 hook（对照 _post_effects_hook）
-  // ═══════════════════════════════════════════════════════════
-
   protected postEffectsHook(
     _entity: EntityState,
     _before: Record<string, number>,
@@ -151,16 +159,6 @@ export class DlcEngine {
     _rawInput: string,
   ): string[] {
     return []
-  }
-
-  // ═══════════════════════════════════════════════════════════
-  // Internal
-  // ═══════════════════════════════════════════════════════════
-
-  private matchCommand(input: string): CommandConfig | undefined {
-    const trimmed = input.trim()
-    return this.commands.find((c) => c.id === trimmed)
-      ?? this.commands.find((c) => (c.aliases ?? []).includes(trimmed))
   }
 
   private handleMeta(cmdId: string, result: ExecuteResult): ExecuteResult {
@@ -172,27 +170,6 @@ export class DlcEngine {
     result.narrative_ids = ['system.reset']
     result.flags = this.reset() as Record<string, number>
     return result
-  }
-
-  /** 执行单条效果；对照 execute_command（modifier 效果按 modifiers 配置，channel 效果直接 add/set）。 */
-  private executeEffect(eff: Record<string, unknown>, entity: EntityState, intensity: number): boolean {
-    const type = String(eff.type ?? '')
-
-    if (type === 'modifier') {
-      const modId = String(eff.modifier ?? eff.label ?? '')
-      const mod = this.ctx.modifiers[modId]
-      if (mod === undefined) return false
-      const entityConfig = this.ctx.entities[entity.entity_id]
-      const modResult = applyModifier(entity, mod, intensity, 0, entityConfig)
-      return modResult.applied
-    }
-
-    // 直接通道效果：对照 _EFFECT_EXECUTORS 的 add/set 等
-    const channel = String(eff.channel ?? '')
-    if (channel === '') return false
-    const entityConfig = this.ctx.entities[entity.entity_id]
-    const delta = applyEffect(entity, channel, eff as never, intensity, entityConfig)
-    return delta !== 0 || type !== 'unknown'
   }
 
   private primaryEntityId(): string {
@@ -261,10 +238,14 @@ export class DlcEngine {
     const ts = now.toISOString().slice(11, 19)
     appendFileSync(join(logDir, `${today}.jsonl`), `${JSON.stringify({ ts, command, diff, flags })}\n`, 'utf8')
   }
+
+  private emitChange(event: DlcStateChangeEvent): void {
+    this.events.emitStateChange(event)
+  }
 }
 
 function round1(v: number): number {
   return Math.round(v * 10) / 10
 }
 
-export type { EntityConfig }
+export type { EntityConfig, CommandEffect }
